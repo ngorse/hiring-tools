@@ -6,6 +6,9 @@ pip install -r requirements.txt
 
 # Tools
 
+* PDF highlighting 
+
+
 ## PDF highlighting
 
 ```bash
