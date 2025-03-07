@@ -21,7 +21,7 @@ def highlight_words_in_pdf(input_pdf, words):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python script.py input.pdf word1 word2 ...")
+        print(f"Usage: python {sys.argv[0]} <input.pdf> <word1> [word2 ...]")
         sys.exit(1)
     
     input_pdf = sys.argv[1]
