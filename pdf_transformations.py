@@ -3,6 +3,18 @@ import os
 
 
 # ----------------------------------------------------------------------------------
+def pdf_to_txt(pdf_path):
+    doc = fitz.open(pdf_path)
+    txt_path = pdf_path.replace('.pdf', '.txt')  
+    with open(txt_path, 'w', encoding='utf-8') as file:
+        for page_num in range(doc.page_count):
+            page = doc.load_page(page_num)
+            file.write(page.get_text())
+    doc.close()
+    return txt_path
+
+
+# ----------------------------------------------------------------------------------
 def highlight_words_in_pdf(input_pdf, words_list):
     try:
         doc = fitz.open(input_pdf)
@@ -18,8 +30,10 @@ def highlight_words_in_pdf(input_pdf, words_list):
         output_pdf = os.path.join(dir_name, f"{base_name}.highlighted{ext}")
         
         doc.save(output_pdf)
+        doc.close()
         return output_pdf
     except Exception as e:
+        doc.close()
         return None
 
 

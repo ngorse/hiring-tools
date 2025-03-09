@@ -5,8 +5,9 @@ import subprocess
 import phonenumbers
 from dotenv import load_dotenv
 from phonenumbers import geocoder
-from highlight_pdf import highlight_words_in_pdf
+from pdf_transformations import highlight_words_in_pdf, pdf_to_txt
 
+# ----------------------------------------------------------------------------------
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
 OWNER = os.getenv('OWNER')
@@ -111,14 +112,15 @@ def download_resume(job_type, name, country, url):
 
 
 # ----------------------------------------------------------------------------------
-def analyze_resume(job, pdf):
-    txt = pdf.replace('.pdf', '.txt')
-    subprocess.run(['pdftotext', pdf, txt])
-    analysis = pdf.replace('.pdf', '.analysis')
-    cmd = f'echo "Analyze job {job} vs resume {txt}" | ollama run hr-agent'
-    #with open(analysis, 'w') as f:
-    #    subprocess.run(cmd, shell=True, stdout=f)
-    #print(f'Analysis saved: {analysis}')
+def analyze_resume(txt_path):
+    resume = open(txt_path)
+    resume_txt = resume.read()
+    analysis_path = txt_path.replace('.txt', '.summary.txt')
+    cmd = f'echo "summarize this resume without giving any explanation: {resume_txt}" | ollama run llama3.2'
+    with open(analysis_path, 'w') as f:
+        subprocess.run(cmd, shell=True, stdout=f)
+    print(f'    {analysis_path}')
+    resume.close()
 
 
 # ----------------------------------------------------------------------------------
@@ -159,16 +161,16 @@ def main(owner_id, pipeline_id, stage_id, job_type):
         if resume_url:
             pdf_path = download_resume(job_type, name, country, resume_url)
             print(f'    {pdf_path}')
-            highlighted_path = highlight_words_in_pdf(pdf_path, KEYWORDS)
-            if highlighted_path:
-                print(f'    {highlighted_path}')
-            print()
-
-            continue
             if pdf_path.endswith('.pdf'):
-                analyze_resume(job_type, pdf_path)
+                highlighted_path = highlight_words_in_pdf(pdf_path, KEYWORDS)
+                if highlighted_path:
+                    print(f'    {highlighted_path}')
+                txt_path = pdf_to_txt(pdf_path)
+                print(f'    {txt_path}')
+                analyze_resume(txt_path)
             else:
                 print(f'Manual review required: {pdf_path}')
+            print()
 
 
 # ----------------------------------------------------------------------------------
