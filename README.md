@@ -12,6 +12,6 @@ pip install -r requirements.txt
 ## PDF highlighting
 
 ```bash
-python highlight.py <input.pdf> <word1> [word2 ...]
+python highlight-pdf.py <input.pdf> <word1> [word2 ...]
 ```
 
