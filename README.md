@@ -1,8 +1,22 @@
 # Initialization
 
+Install requirements:
+
 ```
 pip install -r requirements.txt
 ```
+
+Install libmagic:
+
+- For Ubuntu/Debian:
+```
+sudo apt-get install libmagic1
+```
+- For macOS:
+```
+brew install libmagic
+```
+
 
 # Tools
 
