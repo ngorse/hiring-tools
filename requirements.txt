@@ -2,3 +2,4 @@ PyMuPDF
 python-dotenv
 phonenumbers
 python-magic
+getch
