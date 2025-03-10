@@ -24,7 +24,6 @@ def main(owner_id, pipeline_id, stage_id, job_type):
         highlighted = pdf_path.replace('.pdf', '.highlighted.pdf')
         if os.path.exists(highlighted):
             cmd = f'open "{highlighted}"'
-            print(cmd)
             subprocess.run(cmd, shell=True)
         if os.path.exists(summary):
             with open(summary) as f:
