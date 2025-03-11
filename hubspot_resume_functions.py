@@ -197,11 +197,14 @@ def download_resume(job_type, name, country, url):
 
 # ----------------------------------------------------------------------------------
 def analyze_resume(txt_path):
-    analysis_path = txt_path.replace('.txt', '.summary.txt')
-    cmd = f'echo "summarize this resume without giving any explanation: `cat {txt_path.replace(" ", "\\ ")}`" | ollama run llama3.2'
-    with open(analysis_path, 'w') as f:
-        subprocess.run(cmd, shell=True, stdout=f)
+    tmp_out = '/tmp/scamdetector.txt'
+    analysis_path = txt_path.replace('.txt', '.scamdetector.txt')
+    #cmd = f'echo "summarize this resume without giving any explanation: `cat {txt_path.replace(" ", "\\ ")}`" | ollama run llama3.2'
     print(f'    {analysis_path}')
+    txt_path = txt_path.replace(' ', '\\ ')
+    cmd = f'echo "list non-existing technologies, frameworks, libraries, programming languages that do not exist in the following resume, and based on that give it a scam score from 0 to 10, 10 being a total scam: "`cat {txt_path}` | ollama run llama3.2 | tee {tmp_out}'
+    subprocess.run(cmd, shell=True)
+    shutil.copy(tmp_out, analysis_path)
 
 
 # ----------------------------------------------------------------------------------

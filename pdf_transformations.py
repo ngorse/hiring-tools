@@ -16,11 +16,14 @@ def pdf_to_txt(pdf_path):
 
 # ----------------------------------------------------------------------------------
 def highlight_words_in_pdf(input_pdf, words_list):
+    if isinstance(words_list, list) and len(words_list) == 1:
+        words_list = words_list[0]
+ 
+    words_list = words_list.split(' ')
     try:
         doc = fitz.open(input_pdf)
-
         for page in doc:
-            for word in words_list.split(' '):
+            for word in words_list:
                 text_instances = page.search_for(word)
                 for inst in text_instances:
                     page.add_highlight_annot(inst)
@@ -33,6 +36,7 @@ def highlight_words_in_pdf(input_pdf, words_list):
         doc.close()
         return output_pdf
     except Exception as e:
+        print(f'highlight_words_in_pdf: {e}')
         doc.close()
         return None
 
@@ -48,8 +52,10 @@ def main():
     words_to_highlight = [word.lower() for word in sys.argv[2:]]
     
     highlight_words_in_pdf(input_pdf, words_to_highlight)
+    pdf_to_txt(input_pdf)
 
 
 # ----------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
+
