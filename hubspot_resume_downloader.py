@@ -4,9 +4,11 @@ import os
 
 # ----------------------------------------------------------------------------------
 def main(owner_id, pipeline_id, stage_id, job_type):
+    accepted_countries = hs.ACCEPTED_COUNTRIES.split(',')
     data = hs.get_deals_for_pipeline(owner_id, pipeline_id, stage_id, job_type, hs.LIMIT)
     amount = data.get('total', 0)
     deals = data.get('results', [])
+    rejected = hs.get_stage_id("Rejected")
     print(f'Found {amount} deals for job type {job_type}\n')
     for deal in deals:
         name = deal.get('properties').get('dealname').split(' - ')[0]
@@ -16,7 +18,10 @@ def main(owner_id, pipeline_id, stage_id, job_type):
         print(f'{name} ({deal.get('id')})')
         print(f'    {phone} - {country}')
         print(f'    {hs.get_contact_property(contact_id, 'email')}')
-
+        if (country not in accepted_countries) or (country == 'Unknown'):
+            print(f'    Candidates from {country} not accepted, rejecting')
+            hs.move_deal_to_stage(deal.get('id'), rejected, "Rejected", None, hs.REJECTPATH)
+            continue
         resume_url = hs.get_contact_property(contact_id, 'resume')
         if resume_url:
             pdf_path = hs.download_resume(job_type, name, country, resume_url)

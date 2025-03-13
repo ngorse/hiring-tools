@@ -21,6 +21,7 @@ KEYWORDS = os.getenv('KEYWORDS')
 SAVEPATH = os.getenv('SAVEPATH')
 REJECTPATH = os.getenv('REJECTPATH')
 INTERVIEWPATH = os.getenv('INTERVIEWPATH')
+ACCEPTED_COUNTRIES = os.getenv('ACCEPTED_COUNTRIES')
 
 BASE_URL = 'https://api.hubapi.com/crm/v3'
 HEADERS = {
@@ -94,9 +95,12 @@ def get_associated_contact(deal_id):
 
 # ----------------------------------------------------------------------------------
 def get_contact_property(contact_id, info):
-    response = requests.get(f'{BASE_URL}/objects/contacts/{contact_id}?properties={info}', headers=HEADERS)
-    data = response.json()
-    return data.get('properties', {}).get(info)
+    try:
+        response = requests.get(f'{BASE_URL}/objects/contacts/{contact_id}?properties={info}', headers=HEADERS)
+        data = response.json()
+        return data.get('properties', {}).get(info)
+    except Exception:
+        return 'Unknown'
 
 
 # ----------------------------------------------------------------------------------
@@ -110,10 +114,11 @@ def move_deal_to_stage(deal_id, stage_id, stage_name, path, stage_path):
     response = requests.patch(url, headers=HEADERS, json=payload)
 
     if response.status_code == 200:
-        _, dir_name = os.path.split(path)
-        print(f'    Moved to {stage_name}, {stage_path}/{dir_name}')
-        os.makedirs(stage_path, exist_ok=True)
-        shutil.move(path, f'{stage_path}/{dir_name}')
+        print(f'    Moved to {stage_name}')
+        if path is not None:
+            _, dir_name = os.path.split(path)
+            os.makedirs(stage_path, exist_ok=True)
+            shutil.move(path, f'{stage_path}/{dir_name}')
     else:
         print(f"Error {response.status_code}: {response.text}")
 
@@ -157,6 +162,8 @@ def attach_email_to_deal(deal_id, email_id):
 
 # ----------------------------------------------------------------------------------
 def get_country_by_phone_number(phone_number):
+    if not phone_number:
+        return 'UnknownCountry'
     try:
         parsed_number = phonenumbers.parse(phone_number)
         country = geocoder.country_name_for_number(parsed_number, 'en')

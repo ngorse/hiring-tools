@@ -9,7 +9,7 @@ def main(owner_id, pipeline_id, stage_id, job_type):
     amount = data.get('total', 0)
     deals = data.get('results', [])
     rejected = hs.get_stage_id("Rejected")
-    interview = hs.get_stage_id("Interview")
+    interview = hs.get_stage_id("On hold")
     print(f'Found {amount} deals for job type {job_type}\n')
     for deal in deals:
         name = deal.get('properties').get('dealname').split(' - ')[0]
@@ -20,7 +20,7 @@ def main(owner_id, pipeline_id, stage_id, job_type):
         print(f'    {phone} - {country}')
         print(f'    {hs.get_contact_property(contact_id, 'email')}')
         path, pdf_path = hs.get_resume_path(job_type, name, country, hs.get_contact_property(contact_id, 'linkedin'))
-        summary = pdf_path.replace('.pdf', '.summary.txt')
+        summary = pdf_path.replace('.pdf', '.scamdetector.txt')
         highlighted = pdf_path.replace('.pdf', '.highlighted.pdf')
         if os.path.exists(highlighted):
             cmd = f'open "{highlighted}"'
@@ -34,7 +34,7 @@ def main(owner_id, pipeline_id, stage_id, job_type):
         while char not in ['i', 'r', 's']:
             char = getch.getch()
             if char == 'i':
-                hs.move_deal_to_stage(deal_id, interview, "Interview", path, hs.INTERVIEWPATH)
+                hs.move_deal_to_stage(deal_id, interview, "On Hold", path, hs.INTERVIEWPATH)
             elif char == 'r':
                 hs.move_deal_to_stage(deal_id, rejected, "Rejected", path, hs.REJECTPATH)
             else:
